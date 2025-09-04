@@ -1,0 +1,1 @@
+~/Downloads/x16emu_macos_intel-r47/x16emu -prg ./rectangle.prg -c816 -debug 0x80d -quality nearest -scale 1 -mhz 2
