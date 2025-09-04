@@ -256,9 +256,3 @@ height_draw:
 	.a16
 	.i8
 	rts
- 
-p0: .byte $00, $80, $C0, $E0, $F0, $F8, $FC, $FE
-p1:	.byte $FF, $7F, $3F, $1F, $0F, $07, $03, $01
-p2:	.byte $80, $40, $20, $10, $08, $04, $02, $01 
-
-;.include "fill_screen.asm"
