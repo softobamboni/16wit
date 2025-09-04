@@ -1,33 +1,7 @@
-.org $080D
-.p816
-.segment "STARTUP"
-.segment "INIT"
-.segment "ONCE"
-.segment "CODE"
-.include "x16.inc"
-width 	= $30
-height 	= $32
-xpoint	= $34
-ypoint	= $36
-xpoint2 = $2A
-ypoint2 = $2C
-nibble 	= $38	;8 bit
-nibble2 = $39	;8 bit 
-origin	= $24
-xcalcd  = $26	
-ycalcd  = $28
-temp 	= $22
 
-xnumber = 48
-ynumber = 48
-
-wnumber = 64
-hnumber = 64
-
-.include "init.asm"
-
-instructions:
+rectangle:
 	.a16
+	.i8
 	jsr calcy
 	jsr calcx
 	jsr calc_origin
@@ -57,38 +31,32 @@ instructions:
 	jsr width_draw
 	sec
 	jsr height_draw
-	
-; 	sec
-;	jsr fill_screen
 @end:
 	bra @end
-down:
+
+fill_area:
+	jsr calcy
+	jsr calcx
+	jsr calc_origin
+
+	lda height
+	pha
+@loop:
+	clc
+	jsr width_draw			;do width_draw height times
 	rep #$20
-	lda ypoint2
-	inc
-	sta ypoint
-	sta ypoint2
-	lda xpoint2
-	inc
-	sta xpoint
-	sta xpoint2
-	bra instructions
-left:
-	rep #$20
-	lda xpoint2
+	pla						;fucking inefficient but straightforward
 	dec
-	sta xpoint
-	lda ypoint2
-	sta ypoint
-	bra instructions
-right:
-	rep #$20
-	lda xpoint2
-	inc
-	sta xpoint
-	lda ypoint2
-	sta ypoint
-	brl instructions
+	beq @end
+	pha
+	lda #80
+	clc
+	adc origin
+	sta origin
+	bra @loop
+@end:
+ 	bra @end
+
 calcy:						;make it a subroutine (the rts stuff)
 	rep #$20
 	.a16

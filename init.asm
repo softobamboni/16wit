@@ -1,6 +1,11 @@
+.org $080D
 .p816
+.segment "STARTUP"
+.segment "INIT"
+.segment "ONCE"
+.segment "CODE"
 .include "x16.inc"
-bra init
+	bra init
 														;0=black, .=white
 p0: .byte $00, $80, $C0, $E0, $F0, $F8, $FC, $FE		;........ 0....... 00...... 000..... 0000.... 00000... 000000.. 0000000.
 p1:	.byte $FF, $7F, $3F, $1F, $0F, $07, $03, $01		;00000000 .0000000 ..000000 ...00000 ....0000 .....000 ......00 .......0
@@ -18,11 +23,11 @@ init:
 	lda #hnumber
 	sta height	
 	lda #xnumber
-	sta xpoint	
+	sta ypoint2
+	sta xpoint
 	sta xpoint2
 	lda #ynumber
-	sta ypoint	
-	sta ypoint2
+	sta ypoint
 	sep #$20
 	.a8
 	lda #%00000100
@@ -43,3 +48,6 @@ clear_screen:
 	bne @loop
 	dey
 	bne clear_screen
+
+;	bra fill_area
+.include "rectangle.asm"
