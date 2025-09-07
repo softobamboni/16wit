@@ -11,6 +11,8 @@ p0: .byte $00, $80, $C0, $E0, $F0, $F8, $FC, $FE		;........ 0....... 00...... 00
 p1:	.byte $FF, $7F, $3F, $1F, $0F, $07, $03, $01		;00000000 .0000000 ..000000 ...00000 ....0000 .....000 ......00 .......0
 p2:	.byte $80, $40, $20, $10, $08, $04, $02, $01 		;0....... .0...... ..0..... ...0.... ....0... .....0.. ......0. .......0
 														;i like monospace
+data: .incbin "test.bin"
+
 init:
 	.a16
 	.i8
@@ -49,5 +51,8 @@ clear_screen:
 	dey
 	bne clear_screen
 
-;	bra fill_area
+	jsr bitmap
+	jsr rectangle
+e:	bra e
 .include "rectangle.asm"
+.include "bitmap.asm"
