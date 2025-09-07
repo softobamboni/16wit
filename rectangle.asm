@@ -1,42 +1,47 @@
 
-rectangle:
-	.a16
+rectangle:					;draw a rectangle
+ 	.a16					;arguments: x ($34), y ($36), width ($30), height ($32), color (carry flag)
 	.i8
-	jsr calcy
-	jsr calcx
+	jsr calc_origin
+
+	sep #$10
+	jsr width_draw
+	jsr height_draw
+
+;	ldx nibble
+;	stx nibble2
+;	lda xpoint
+;	dec
+;	clc
+;	adc width
+;	sta xpoint
+	lda ypoint
+	pha
+	dec
+	clc
+	adc height
+	sta ypoint
 	jsr calc_origin
 
 	clc
 	jsr width_draw
-	clc
-	jsr height_draw
 
-	ldx nibble
-	stx nibble2
+	pla
+	sta ypoint
+
 	lda xpoint
 	dec
 	clc
 	adc width
 	sta xpoint
-	jsr calcx
-	lda ypoint
-	dec
-	clc
-	adc height
-	sta ypoint
-	jsr calcy
 	jsr calc_origin
 
-	sec
-	jsr width_draw
-	sec
+	clc
 	jsr height_draw
 @end:
 	bra @end
 
-fill_area:
-	jsr calcy
-	jsr calcx
+fill_area:					;arguments: x ($34), y ($36), width ($30), height ($32), color (carry flag)
 	jsr calc_origin
 
 	lda height
@@ -57,8 +62,8 @@ fill_area:
 @end:
  	bra @end
 
-calcy:						;make it a subroutine (the rts stuff)
-	rep #$20
+calc_origin:				;calculate origin
+	rep #$20				;needed for every draw subroutine internally
 	.a16
 	lda ypoint
 	asl
@@ -76,10 +81,6 @@ calcy:						;make it a subroutine (the rts stuff)
 	clc
 	adc temp
 	sta ycalcd
-	rts
-calcx:						;make it a subroutine too
-;	rep #$20				;maybe calcx and calcy = same subroutine (calcorigin)
-	.a16					;nibble at nibble
 	lda xpoint
 	and #$0007
 	tax
@@ -89,16 +90,12 @@ calcx:						;make it a subroutine too
 	lsr
 	sta xcalcd
 	stx nibble
-;	sep #$20
-;	.a8
-	rts
-calc_origin:
 	lda xcalcd
 	clc
 	adc ycalcd		;0+x+y = x+y
 	sta origin
 	rts
-width_draw:			;subroutine (args = origin (memory), width (memory), carry (1 = reverse))
+width_draw:			;subroutine (args = origin (memory), width (memory), carry (1 = change color))
 	.a16
 	.i8
 	ldy #1
@@ -107,11 +104,7 @@ width_draw:			;subroutine (args = origin (memory), width (memory), carry (1 = re
 	sta VERA_addr_low
 	stz VERA_ctrl
 	sta VERA_addr_low
-	lda #$0010
-	bcc @skip
-	ora #$0008
-@skip:
-	tax
+	ldx #$10
 	stx VERA_addr_bank
 	sty VERA_ctrl
 	stx VERA_addr_bank
@@ -126,8 +119,6 @@ width_draw:			;subroutine (args = origin (memory), width (memory), carry (1 = re
 	lsr
 	sep #$20
 	.a8
-	cpx #$18
-	beq reverse
 @copy_first:
 	tax	
 	ldy nibble
@@ -149,34 +140,11 @@ width_draw:			;subroutine (args = origin (memory), width (memory), carry (1 = re
 	ora VERA_data0
 	sta VERA_data1
 @skip3:
-	rts
-reverse:
-	pha
-	lda nibble
-	inc
-	and #7
-	beq @skip
-	tay
-	lda p0,y
-	ora VERA_data0
-	sta VERA_data1
-@skip:
-	lda #$FF
-	ply
-	dey
-@r_copy_8px:
-	sta VERA_data0
-	bit VERA_data1
-	dey
-	bne @r_copy_8px
-@r_copy_last:
-	ldy nibble2
-	lda p1,y
-	ora VERA_data0
-	sta VERA_data1
-@skip2:
+	rep #$20
 	rts
 height_draw:
+	.a16
+	.i8
 	lda	origin
 	ldy #1
 	stz VERA_ctrl
@@ -185,13 +153,6 @@ height_draw:
 	sta VERA_addr_low
 	lda #$00C0
 	tax	
-	bcc @skip
-	ora #$0008
-	tax
-	lda VERA_addr_low
-;	clc
-;	adc #$0050
-;	sta VERA_addr_low
 @skip:
 	stz VERA_ctrl
 	stx VERA_addr_bank
