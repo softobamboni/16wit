@@ -6,6 +6,7 @@ Commander x<u>16</u> <u>w</u>indow system, <u>i</u>nterface and <u>t</u>ools (pr
 - [x] 1 px border rectangles
 - [x] filled rectangles
 - [ ] copy bitmap data
+- [ ] change palette
 - [ ] bitmap font format
 - [ ] window manager
 - [ ] programs
