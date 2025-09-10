@@ -56,3 +56,4 @@ clear_screen:
 e:	bra e
 .include "rectangle.asm"
 .include "bitmap.asm"
+.include "calc_origin.asm"
